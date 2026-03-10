@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>THMarcom – Lead Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#020817;--surface:#0f172a;--surface2:#1e293b;--border:#1e293b;
+    --blue:#3b82f6;--purple:#8b5cf6;--green:#22c55e;--orange:#f59e0b;--red:#ef4444;
+    --text:#f1f5f9;--muted:#64748b;--subtle:#94a3b8;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+  button{cursor:pointer;font-family:inherit}
+  select{font-family:inherit}
+
+  /* HEADER */
+  .header{background:linear-gradient(135deg,#0f172a,#1e293b);border-bottom:1px solid var(--border);padding:18px 24px;display:flex;align-items:center;gap:14px}
+  .logo{width:44px;height:44px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+  .header-title{font-weight:900;font-size:19px;letter-spacing:-0.4px}
+  .header-sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .header-right{margin-left:auto}
+
+  /* MAIN */
+  .main{max-width:920px;margin:0 auto;padding:28px 16px}
+
+  /* SECTION LABEL */
+  .label{font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--muted);margin-bottom:10px;text-transform:uppercase}
+
+  /* CARDS */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px}
+  .card+.card{margin-top:14px}
+
+  /* STEP: CONFIG */
+  .hero{text-align:center;margin-bottom:32px}
+  .hero h1{font-size:34px;font-weight:900;letter-spacing:-1px;background:linear-gradient(90deg,var(--blue),var(--purple),#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+  .hero p{color:var(--muted);font-size:15px}
+
+  .sectors{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px}
+  .sector-btn{background:var(--surface2);border:1px solid var(--border);color:var(--subtle);padding:10px 12px;border-radius:10px;font-size:13px;font-weight:500;transition:all 0.15s}
+  .sector-btn.active{background:linear-gradient(135deg,var(--blue),var(--purple));border-color:transparent;color:#fff;font-weight:700}
+  .sector-btn:hover:not(.active){border-color:var(--blue);color:var(--text)}
+
+  .radio-list button{display:block;width:100%;text-align:left;background:transparent;border:1px solid transparent;color:var(--muted);padding:8px 12px;border-radius:8px;font-size:13px;margin-bottom:4px;transition:all 0.15s}
+  .radio-list button.active{background:#1e3a5f;border-color:var(--blue);color:#60a5fa;font-weight:700}
+  .radio-list button:hover:not(.active){color:var(--text)}
+
+  .count-hint{margin-top:14px;padding:12px;background:var(--surface2);border-radius:10px;font-size:12px;color:var(--muted)}
+  .count-hint span{color:var(--subtle);font-weight:600}
+
+  .start-btn{width:100%;background:linear-gradient(135deg,var(--blue),var(--purple));border:none;color:#fff;padding:18px;border-radius:14px;font-size:16px;font-weight:800;letter-spacing:-0.3px;box-shadow:0 8px 32px #3b82f640;transition:transform 0.1s,box-shadow 0.1s}
+  .start-btn:hover{transform:translateY(-1px);box-shadow:0 12px 40px #3b82f660}
+  .start-btn:active{transform:translateY(0)}
+
+  /* STEP: RUNNING */
+  .run-center{text-align:center;padding:20px 0}
+  .pulse{animation:pulse 1.2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(0.95)}}
+  .progress-bar-wrap{height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;margin:10px 0}
+  .progress-bar{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:5px;transition:width 0.5s ease}
+  .run-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+  .run-item{background:var(--surface2);border-radius:10px;padding:14px;text-align:center}
+  .run-item .icon{font-size:22px}
+  .run-item .name{font-size:12px;font-weight:700;margin-top:6px}
+  .run-item .sub{font-size:11px;color:var(--green);margin-top:2px}
+  .preview-lead{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+  .stop-btn{background:transparent;border:1px solid var(--surface2);color:var(--muted);padding:10px 20px;border-radius:8px;font-size:13px;margin-top:16px}
+
+  /* STEP: RESULTS */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
+  .stat-card{background:var(--surface);border-radius:14px;padding:16px;text-align:center;border:1px solid var(--border)}
+  .stat-val{font-size:30px;font-weight:900;line-height:1}
+  .stat-label{font-size:11px;color:var(--muted);margin-top:6px}
+
+  .toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+  .filter-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:8px;font-size:12px;font-weight:500}
+  .filter-btn.active{background:#1e3a5f;border-color:var(--blue);color:#60a5fa;font-weight:700}
+  .sort-select{background:var(--surface);border:1px solid var(--border);color:var(--subtle);padding:6px 12px;border-radius:8px;font-size:12px;margin-left:auto}
+  .export-btn{background:linear-gradient(135deg,var(--green),#16a34a);border:none;color:#fff;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700}
+
+  /* LEAD CARD */
+  .lead-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:8px;transition:border-color 0.2s}
+  .lead-card.top{border-color:#22c55e33}
+  .lead-header{padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+  .lead-num{width:32px;height:32px;background:var(--surface2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted);flex-shrink:0}
+  .lead-name{font-weight:700;font-size:14px}
+  .lead-sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .lead-score{text-align:right;flex-shrink:0}
+  .score-big{font-size:24px;font-weight:900;line-height:1}
+  .score-lbl{font-size:10px;color:var(--muted)}
+  .chevron{color:var(--muted);font-size:14px;flex-shrink:0;margin-left:4px}
+
+  .lead-body{padding:0 16px 16px;border-top:1px solid var(--border);display:none}
+  .lead-body.open{display:block}
+  .lead-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+  .score-row{margin-bottom:8px}
+  .score-name{font-size:11px;color:var(--muted);margin-bottom:4px}
+  .score-bar-wrap{display:flex;align-items:center;gap:8px}
+  .score-bar-bg{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+  .score-bar-fill{height:100%;border-radius:3px;transition:width 0.6s ease}
+  .score-bar-num{font-size:11px;font-weight:700;min-width:14px}
+  .contact-line{font-size:12px;color:var(--subtle);line-height:2}
+  .ai-box{margin-top:14px;padding:12px;background:var(--surface2);border-radius:10px}
+  .ai-title{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;margin-bottom:6px;text-transform:uppercase}
+  .ai-text{font-size:13px;color:#cbd5e1;margin-bottom:10px}
+  .tags{display:flex;gap:6px;flex-wrap:wrap}
+  .tag{background:#0ea5e920;border:1px solid #0ea5e940;color:#38bdf8;padding:2px 8px;border-radius:20px;font-size:11px}
+
+  /* BADGE */
+  .badge{padding:2px 9px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:0.3px}
+  .badge-hoog{background:var(--green);color:#052e16}
+  .badge-middel{background:var(--orange);color:#1c1004}
+  .badge-laag{background:#334155;color:var(--subtle)}
+
+  /* BACK BTN */
+  .back-btn{background:var(--surface2);border:1px solid var(--border);color:var(--subtle);padding:8px 16px;border-radius:8px;font-size:13px}
+
+  @media(max-width:600px){
+    .stats-grid{grid-template-columns:1fr 1fr}
+    .lead-grid{grid-template-columns:1fr}
+    .hero h1{font-size:24px}
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">🎯</div>
+  <div>
+    <div class="header-title">THMarcom <span style="color:var(--blue)">Lead Engine</span></div>
+    <div class="header-sub">AI-powered MKB leadgeneratie · Apify + Claude AI</div>
+  </div>
+  <div class="header-right" id="headerRight"></div>
+</div>
+
+<div class="main" id="app">
+  <!-- Rendered by JS -->
+</div>
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────────────────────────
+// BELANGRIJK: vervang dit met jouw Railway URL na deployment
+// Lokaal: http://localhost:3001
+// Railway: https://jouw-app.up.railway.app
+const API_BASE = window.location.origin;
+
+const SECTORS = [
+  "Bouwbedrijven","Installatiebedrijven","Aannemers","Schilders",
+  "Afbouw / Stukadoors","Makelaars","Autogarages","Fysiotherapeuten",
+  "Tandartsen","Schoonmaakbedrijven","Hoveniers","Restaurants",
+  "Kappers","Beauty salons","Sportscholen","Lokale webshops"
+];
+const PROVINCES = ["Noord-Brabant","Gelderland","Zuid-Holland","Utrecht","Alle provincies"];
+const COUNTS = [
+  {n:10, label:"10 leads", hint:"(snel, ~30 sec)"},
+  {n:25, label:"25 leads", hint:"(aanbevolen, ~2 min)"},
+  {n:50, label:"50 leads", hint:"(uitgebreid, ~4 min)"},
+  {n:100, label:"100 leads", hint:"(volledig, ~8 min)"},
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let state = {
+  step: "config",       // config | running | results
+  sector: "Bouwbedrijven",
+  provincie: "Noord-Brabant",
+  count: 25,
+  leads: [],
+  progress: { current: 0, total: 0, status: "Opstarten..." },
+  filter: "ALLE",
+  sort: "marketingScore",
+  runId: null,
+  stopRequested: false,
+};
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render() {
+  const app = document.getElementById("app");
+  const hr  = document.getElementById("headerRight");
+
+  if (state.step === "config") {
+    hr.innerHTML = "";
+    app.innerHTML = renderConfig();
+  } else if (state.step === "running") {
+    hr.innerHTML = "";
+    app.innerHTML = renderRunning();
+  } else {
+    hr.innerHTML = `<button class="back-btn" onclick="resetToConfig()">← Nieuwe zoekopdracht</button>`;
+    app.innerHTML = renderResults();
+  }
+  attachEvents();
+}
+
+// ─── CONFIG SCREEN ────────────────────────────────────────────────────────────
+function renderConfig() {
+  const sectorBtns = SECTORS.map(s =>
+    `<button class="sector-btn ${state.sector===s?'active':''}" onclick="setSector('${s}')">${s}</button>`
+  ).join("");
+
+  const provBtns = PROVINCES.map(p =>
+    `<button class="${state.provincie===p?'active':''}" onclick="setProv('${p}')">${state.provincie===p?'●':'○'} ${p}</button>`
+  ).join("");
+
+  const countBtns = COUNTS.map(c =>
+    `<button class="${state.count===c.n?'active':''}" onclick="setCount(${c.n})">${state.count===c.n?'●':'○'} ${c.label} <span style="color:var(--muted)">${c.hint}</span></button>`
+  ).join("");
+
+  return `
+  <div class="hero">
+    <h1>Vind je volgende 500+ leads</h1>
+    <p>Kies sector en regio — Claude AI scoort elke lead automatisch op marketingkansen</p>
+  </div>
+
+  <div class="card">
+    <div class="label">Sector</div>
+    <div class="sectors">${sectorBtns}</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
+    <div class="card">
+      <div class="label">Provincie</div>
+      <div class="radio-list">${provBtns}</div>
+    </div>
+    <div class="card">
+      <div class="label">Aantal leads</div>
+      <div class="radio-list">${countBtns}</div>
+      <div class="count-hint">⏱ Geschatte tijd: <span>${Math.ceil(state.count * 5 / 60)} min ${(state.count * 5) % 60}s</span></div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px">
+    <button class="start-btn" onclick="startPipeline()">
+      🚀 Start Lead Engine — ${state.count} ${state.sector} in ${state.provincie}
+    </button>
+  </div>`;
+}
+
+// ─── RUNNING SCREEN ───────────────────────────────────────────────────────────
+function renderRunning() {
+  const pct = state.progress.total ? (state.progress.current / state.progress.total * 100) : 0;
+
+  const previewLeads = state.leads.slice(-4).map(l => `
+    <div class="preview-lead">
+      <div>
+        <strong>${l.bedrijfsnaam}</strong>
+        <span style="color:var(--muted);font-size:12px;margin-left:8px">${l.plaats}</span>
+      </div>
+      ${l.aiScore ? badge(l.aiScore.prioriteit) : '<span style="color:var(--muted);font-size:12px">Analyseren...</span>'}
+    </div>`).join("");
+
+  return `
+  <div class="run-center">
+    <div class="pulse" style="font-size:52px;margin-bottom:14px">🤖</div>
+    <h2 style="font-size:22px;font-weight:900;margin-bottom:6px">Pipeline actief...</h2>
+    <p style="color:var(--muted)">${state.progress.status}</p>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
+      <span style="color:var(--muted)">Voortgang</span>
+      <span style="color:var(--blue);font-weight:700">${state.progress.current} / ${state.progress.total || '...'}</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" style="width:${pct}%"></div>
+    </div>
+    <div class="run-grid">
+      <div class="run-item"><div class="icon">🔍</div><div class="name">Google Maps</div><div class="sub">Gescrapet</div></div>
+      <div class="run-item"><div class="icon">🤖</div><div class="name">Claude AI</div><div class="sub">Analyseert</div></div>
+      <div class="run-item"><div class="icon">📊</div><div class="name">Scores</div><div class="sub">Berekend</div></div>
+    </div>
+  </div>
+
+  ${state.leads.length > 0 ? `
+  <div style="margin-top:16px">
+    <div class="label">Live preview</div>
+    ${previewLeads}
+  </div>` : ""}
+
+  <div style="text-align:center">
+    <button class="stop-btn" onclick="stopPipeline()">Stop & bekijk resultaten</button>
+  </div>`;
+}
+
+// ─── RESULTS SCREEN ───────────────────────────────────────────────────────────
+function renderResults() {
+  const filtered = state.leads
+    .filter(l => state.filter === "ALLE" || l.aiScore?.prioriteit === state.filter)
+    .sort((a,b) => (b.aiScore?.[state.sort]||0) - (a.aiScore?.[state.sort]||0));
+
+  const hoog   = state.leads.filter(l => l.aiScore?.prioriteit === "HOOG").length;
+  const middel = state.leads.filter(l => l.aiScore?.prioriteit === "MIDDEL").length;
+  const avg    = state.leads.length
+    ? (state.leads.reduce((s,l)=>s+(l.aiScore?.marketingScore||0),0)/state.leads.length).toFixed(1) : 0;
+
+  const cards = filtered.map((l,i) => renderLeadCard(l,i)).join("");
+
+  return `
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val" style="color:var(--blue)">${state.leads.length}</div><div class="stat-label">📋 Totaal leads</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--green)">${hoog}</div><div class="stat-label">🔥 Top leads</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--orange)">${middel}</div><div class="stat-label">✅ Goede leads</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--purple)">${avg}</div><div class="stat-label">⭐ Gem. score</div></div>
+  </div>
+
+  <div class="toolbar">
+    ${["ALLE","HOOG","MIDDEL","LAAG"].map(f => `
+      <button class="filter-btn ${state.filter===f?'active':''}" onclick="setFilter('${f}')">${f} (${f==='ALLE'?state.leads.length:f==='HOOG'?hoog:f==='MIDDEL'?middel:state.leads.length-hoog-middel})</button>
+    `).join("")}
+    <select class="sort-select" onchange="setSort(this.value)">
+      <option value="marketingScore" ${state.sort==='marketingScore'?'selected':''}>Sorteer: Marketing Score</option>
+      <option value="seoScore" ${state.sort==='seoScore'?'selected':''}>Sorteer: SEO Score</option>
+      <option value="socialScore" ${state.sort==='socialScore'?'selected':''}>Sorteer: Social Score</option>
+    </select>
+    <button class="export-btn" onclick="exportCSV()">⬇️ Export CSV (${filtered.length})</button>
+  </div>
+
+  <div id="leadList">${cards}</div>
+  ${filtered.length===0?'<div style="text-align:center;padding:40px;color:var(--muted)">Geen leads voor dit filter.</div>':''}`;
+}
+
+function renderLeadCard(lead, index) {
+  const s = lead.aiScore;
+  if (!s) return "";
+  const scoreColor = s.marketingScore>=8 ? "var(--green)" : s.marketingScore>=6 ? "var(--orange)" : "var(--red)";
+
+  return `
+  <div class="lead-card ${s.prioriteit==='HOOG'?'top':''}" id="card_${lead.id}">
+    <div class="lead-header" onclick="toggleCard('${lead.id}')">
+      <div class="lead-num">${index+1}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div class="lead-name">${lead.bedrijfsnaam}</div>
+          ${badge(s.prioriteit)}
+        </div>
+        <div class="lead-sub">${lead.sector} · ${lead.plaats} · ${lead.provincie}</div>
+      </div>
+      <div class="lead-score">
+        <div class="score-big" style="color:${scoreColor}">${s.marketingScore}</div>
+        <div class="score-lbl">SCORE</div>
+      </div>
+      <div class="chevron" id="chev_${lead.id}">▼</div>
+    </div>
+    <div class="lead-body" id="body_${lead.id}">
+      <div class="lead-grid">
+        <div>
+          <div class="label">Scores</div>
+          ${scoreBar("Marketing kans", s.marketingScore)}
+          ${scoreBar("SEO verbetering nodig", s.seoScore)}
+          ${scoreBar("Social verbetering nodig", s.socialScore)}
+        </div>
+        <div>
+          <div class="label">Contact</div>
+          <div class="contact-line">
+            ${lead.contactpersoon ? `👤 ${lead.contactpersoon}<br>` : ""}
+            📧 ${lead.email || "–"}<br>
+            📞 ${lead.telefoon || "–"}<br>
+            ${lead.website ? `🌐 <a href="https://${lead.website}" target="_blank" style="color:var(--blue)">${lead.website}</a><br>` : ""}
+            ${lead.instagram ? `📸 ${lead.instagram}<br>` : ""}
+            ⭐ ${lead.googleReviews} Google reviews
+            ${lead.googleRating ? ` · ${lead.googleRating}/5` : ""}
+          </div>
+        </div>
+      </div>
+      <div class="ai-box">
+        <div class="ai-title">AI Analyse</div>
+        <div class="ai-text">💡 ${s.redenKort}</div>
+        <div class="tags">${(s.kansen||[]).map(k=>`<span class="tag">${k}</span>`).join("")}</div>
+        ${s.risico ? `<div style="font-size:11px;color:var(--muted);margin-top:8px">⚠️ Risico: ${s.risico}</div>` : ""}
+      </div>
+    </div>
+  </div>`;
+}
+
+function scoreBar(name, score) {
+  const pct = score * 10;
+  const color = score>=8?"var(--green)":score>=6?"var(--orange)":"var(--red)";
+  return `
+  <div class="score-row">
+    <div class="score-name">${name}</div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <span class="score-bar-num" style="color:${color}">${score}</span>
+    </div>
+  </div>`;
+}
+
+function badge(p) {
+  const map = {HOOG:"badge-hoog",MIDDEL:"badge-middel",LAAG:"badge-laag"};
+  const labels = {HOOG:"🔥 HOOG",MIDDEL:"✅ MIDDEL",LAAG:"⚠️ LAAG"};
+  return `<span class="badge ${map[p]||'badge-laag'}">${labels[p]||p}</span>`;
+}
+
+// ─── PIPELINE ─────────────────────────────────────────────────────────────────
+async function startPipeline() {
+  state.step = "running";
+  state.leads = [];
+  state.stopRequested = false;
+  state.progress = { current: 0, total: 0, status: "Apify scraper opstarten..." };
+  render();
+
+  try {
+    // Step 1: Start Apify scraper
+    const scrapeRes = await fetch(`${API_BASE}/api/scrape`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sector: state.sector, provincie: state.provincie, aantalLeads: state.count })
+    });
+    const { runId, error } = await scrapeRes.json();
+    if (error) throw new Error(error);
+    state.runId = runId;
+
+    // Step 2: Poll until done
+    state.progress.status = "Google Maps scrapen... (dit duurt ~1 minuut)";
+    render();
+    await pollUntilDone(runId);
+
+    if (state.stopRequested) { state.step = "results"; render(); return; }
+
+    // Step 3: Fetch raw results
+    state.progress.status = "Leads ophalen van Apify...";
+    render();
+    const resultsRes = await fetch(
+      `${API_BASE}/api/results/${runId}?limit=${state.count}&sector=${encodeURIComponent(state.sector)}&provincie=${encodeURIComponent(state.provincie)}`
+    );
+    const rawLeads = await resultsRes.json();
+    if (!Array.isArray(rawLeads) || rawLeads.length === 0) throw new Error("Geen leads gevonden. Controleer je Apify token.");
+
+    // Step 4: Score each lead with Claude
+    state.progress.total = rawLeads.length;
+    for (let i = 0; i < rawLeads.length; i++) {
+      if (state.stopRequested) break;
+      const lead = rawLeads[i];
+      state.progress.current = i + 1;
+      state.progress.status = `Claude analyseert: ${lead.bedrijfsnaam}...`;
+      render();
+
+      const scoreRes = await fetch(`${API_BASE}/api/score`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(lead)
+      });
+      const aiScore = await scoreRes.json();
+      state.leads.push({ ...lead, aiScore });
+      render();
+    }
+
+    state.step = "results";
+    render();
+
+  } catch (err) {
+    alert("❌ Fout: " + err.message + "\n\nControleer of je Apify token en Anthropic API key correct zijn ingesteld in Railway.");
+    state.step = "config";
+    render();
+  }
+}
+
+async function pollUntilDone(runId) {
+  while (!state.stopRequested) {
+    await sleep(3000);
+    const r = await fetch(`${API_BASE}/api/status/${runId}`);
+    const { status, itemCount } = await r.json();
+    state.progress.status = `Apify scraper actief... ${itemCount} bedrijven gevonden`;
+    render();
+    if (status === "SUCCEEDED" || status === "FAILED" || status === "ABORTED") break;
+  }
+}
+
+function stopPipeline() { state.stopRequested = true; }
+function resetToConfig() { state.step = "config"; state.leads = []; render(); }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ─── INTERACTIONS ─────────────────────────────────────────────────────────────
+function toggleCard(id) {
+  const body = document.getElementById("body_" + id);
+  const chev = document.getElementById("chev_" + id);
+  if (!body) return;
+  const open = body.classList.toggle("open");
+  if (chev) chev.textContent = open ? "▲" : "▼";
+}
+
+function exportCSV() {
+  const filtered = state.leads.filter(l => state.filter === "ALLE" || l.aiScore?.prioriteit === state.filter);
+  const headers = ["Bedrijfsnaam","Sector","Plaats","Provincie","Website","Email","Telefoon","Adres","Google Reviews","Google Rating","Medewerkers","LinkedIn","Instagram","Marketing Score","SEO Score","Social Score","Prioriteit","AI Analyse","Kansen"];
+  const rows = filtered.map(l => [
+    l.bedrijfsnaam, l.sector, l.plaats, l.provincie, l.website, l.email, l.telefoon, l.adres||"",
+    l.googleReviews, l.googleRating||"", l.aantalMedewerkers||"", l.linkedin, l.instagram,
+    l.aiScore?.marketingScore||"", l.aiScore?.seoScore||"", l.aiScore?.socialScore||"",
+    l.aiScore?.prioriteit||"", l.aiScore?.redenKort||"", (l.aiScore?.kansen||[]).join(" | ")
+  ].map(v => `"${String(v||"").replace(/"/g,'""')}"`).join(","));
+
+  const csv = "\uFEFF" + [headers.join(","), ...rows].join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], { type:"text/csv;charset=utf-8" }));
+  a.download = `THMarcom_Leads_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ─── STATE SETTERS ────────────────────────────────────────────────────────────
+function setSector(s)  { state.sector = s;    render(); }
+function setProv(p)    { state.provincie = p;  render(); }
+function setCount(n)   { state.count = n;      render(); }
+function setFilter(f)  { state.filter = f;     render(); }
+function setSort(s)    { state.sort = s;        render(); }
+
+function attachEvents() {
+  // All interactions are handled via inline onclick
+}
+
+// ─── BOOT ─────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
